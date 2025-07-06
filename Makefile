@@ -34,5 +34,13 @@ get-credentials: ## Obtém as credenciais do banco do Secrets Manager
 	aws secretsmanager get-secret-value --secret-id fiap-hack/db-credentials --query SecretString --output text | jq -r '.url'
 
 test-connection: ## Testa a conexão com o banco (requer psql)
-	$(eval DB_URL := $(shell aws secretsmanager get-secret-value --secret-id fiap-hack/db-credentials --query SecretString --output text | jq -r '.url'))
-	psql "$(DB_URL)" -c "SELECT version();" 
+	@echo "=== Testando conexão com o banco ==="
+	@echo "Endpoint: $(shell cd terraform && terraform output -raw db_endpoint)"
+	@echo "Database: $(shell cd terraform && terraform output -raw db_name)"
+	@echo "Username: $(shell cd terraform && terraform output -raw db_username)"
+	@echo ""
+	@echo "Para testar a conexão, instale o psql e use:"
+	@echo "aws secretsmanager get-secret-value --secret-id fiap-hack/db-credentials --query SecretString --output text | jq -r '.url' | xargs -I {} psql {} -c 'SELECT version();'"
+	@echo ""
+	@echo "Ou use o comando direto:"
+	@echo "psql postgresql://postgres:[SENHA]@$(shell cd terraform && terraform output -raw db_endpoint)/fiaphack -c 'SELECT version();'" 
