@@ -49,7 +49,7 @@ variable "db_username" {
 variable "db_engine_version" {
   description = "Versão do PostgreSQL"
   type        = string
-  default     = "15.5"
+  default     = "13.15"
 }
 
 variable "backup_retention_period" {
