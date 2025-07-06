@@ -1,10 +1,6 @@
-## Arquitetura
-
-O banco de dados foi projetado seguindo as melhores práticas da AWS:
-
 ### Componentes Criados
 
-- **RDS PostgreSQL 15.5**: Instância gerenciada pela AWS
+- **RDS PostgreSQL 13.15**: Instância gerenciada pela AWS
 - **Security Group**: Configurado para permitir acesso apenas do cluster EKS
 - **Subnet Group**: Utilizando as subnets privadas da VPC
 - **Parameter Group**: Configurações otimizadas para PostgreSQL
@@ -85,10 +81,3 @@ O banco está configurado para:
 - Log de conexões
 - Log de desconexões
 - Log de queries com duração > 1 segundo
-
-## Próximos Passos
-
-Este banco será utilizado pelo serviço principal para:
-- Armazenar dados de usuários
-- Logs de processamento
-- Metadados de arquivos 

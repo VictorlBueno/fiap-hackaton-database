@@ -47,8 +47,8 @@ resource "aws_db_subnet_group" "main" {
 }
 
 resource "aws_db_parameter_group" "main" {
-  family = "postgres15"
-  name   = "${var.project_name}-postgres15"
+  family = "postgres13"
+  name   = "${var.project_name}-postgres13"
   
   parameter {
     name  = "log_connections"
@@ -71,29 +71,24 @@ resource "aws_db_parameter_group" "main" {
 resource "aws_db_instance" "main" {
   identifier = "${var.project_name}-postgres"
   
-  engine         = "postgres"
-  engine_version = var.db_engine_version
-  instance_class = var.db_instance_class
-  
-  allocated_storage     = var.db_allocated_storage
-  max_allocated_storage = var.db_max_allocated_storage
-  storage_type          = "gp2"
-  storage_encrypted     = true
-  
-  db_name  = var.db_name
-  username = var.db_username
-  password = random_password.db_password.result
-  
+  allocated_storage      = var.db_allocated_storage
+  storage_type           = "gp2"
+  engine                 = "postgres"
+  engine_version         = var.db_engine_version
+  instance_class         = var.db_instance_class
+  db_name                = var.db_name
+  username               = var.db_username
+  password               = random_password.db_password.result
   vpc_security_group_ids = [aws_security_group.rds.id]
   db_subnet_group_name   = aws_db_subnet_group.main.name
   parameter_group_name   = aws_db_parameter_group.main.name
+  publicly_accessible    = false
+  skip_final_snapshot    = false
+  final_snapshot_identifier = "${var.project_name}-postgres-final-snapshot"
   
   backup_retention_period = var.backup_retention_period
   backup_window          = var.backup_window
   maintenance_window     = var.maintenance_window
-  
-  skip_final_snapshot = false
-  final_snapshot_identifier = "${var.project_name}-postgres-final-snapshot"
   
   deletion_protection = false
   
@@ -104,7 +99,10 @@ resource "aws_db_instance" "main" {
 
 resource "random_password" "db_password" {
   length  = 16
-  special = true
+  special = false
+  upper   = true
+  lower   = true
+  numeric = true
 }
 
 resource "aws_secretsmanager_secret" "db_credentials" {
