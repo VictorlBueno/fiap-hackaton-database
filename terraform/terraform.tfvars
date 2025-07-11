@@ -1,0 +1,12 @@
+aws_region = "us-east-1"
+environment = "production"
+project_name = "fiap-hack"
+db_instance_class = "db.t3.micro"
+db_allocated_storage = 20
+db_max_allocated_storage = 100
+db_name = "fiaphack"
+db_username = "postgres"
+db_engine_version = "13.15"
+backup_retention_period = 7
+backup_window = "03:00-04:00"
+maintenance_window = "sun:04:00-sun:05:00" 

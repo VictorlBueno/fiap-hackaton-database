@@ -52,6 +52,12 @@ variable "db_engine_version" {
   default     = "13.15"
 }
 
+variable "maintenance_window" {
+  description = "Janela de manutenção"
+  type        = string
+  default     = "sun:04:00-sun:05:00"
+}
+
 variable "backup_retention_period" {
   description = "Período de retenção de backup em dias"
   type        = number
@@ -62,10 +68,4 @@ variable "backup_window" {
   description = "Janela de backup"
   type        = string
   default     = "03:00-04:00"
-}
-
-variable "maintenance_window" {
-  description = "Janela de manutenção"
-  type        = string
-  default     = "sun:04:00-sun:05:00"
 } 

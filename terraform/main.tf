@@ -21,10 +21,11 @@ resource "aws_security_group" "rds" {
   vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
   
   ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    security_groups = [data.terraform_remote_state.vpc.outputs.cluster_security_group_id]
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc_cidr]
+    description = "PostgreSQL from VPC"
   }
   
   egress {
@@ -32,6 +33,7 @@ resource "aws_security_group" "rds" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "All outbound traffic"
   }
   
   tags = merge(local.tags, {
@@ -83,14 +85,15 @@ resource "aws_db_instance" "main" {
   db_subnet_group_name   = aws_db_subnet_group.main.name
   parameter_group_name   = aws_db_parameter_group.main.name
   publicly_accessible    = false
-  skip_final_snapshot    = false
-  final_snapshot_identifier = "${var.project_name}-postgres-final-snapshot"
   
   backup_retention_period = var.backup_retention_period
   backup_window          = var.backup_window
   maintenance_window     = var.maintenance_window
   
   deletion_protection = false
+  skip_final_snapshot    = true
+  
+  storage_encrypted = true
   
   tags = merge(local.tags, {
     Name = "${var.project_name}-postgres"
@@ -105,14 +108,12 @@ resource "random_password" "db_password" {
   numeric = true
 }
 
-resource "aws_secretsmanager_secret" "db_credentials" {
+data "aws_secretsmanager_secret" "db_credentials" {
   name = "${var.project_name}/db-credentials"
-  
-  tags = local.tags
 }
 
 resource "aws_secretsmanager_secret_version" "db_credentials" {
-  secret_id = aws_secretsmanager_secret.db_credentials.id
+  secret_id = data.aws_secretsmanager_secret.db_credentials.id
   secret_string = jsonencode({
     username = aws_db_instance.main.username
     password = random_password.db_password.result
@@ -138,9 +139,15 @@ output "db_username" {
   value       = aws_db_instance.main.username
 }
 
+output "db_password" {
+  description = "Senha do banco de dados"
+  value       = random_password.db_password.result
+  sensitive   = true
+}
+
 output "db_secret_arn" {
   description = "ARN do secret com as credenciais"
-  value       = aws_secretsmanager_secret.db_credentials.arn
+  value       = data.aws_secretsmanager_secret.db_credentials.arn
 }
 
 output "db_subnet_group_name" {
