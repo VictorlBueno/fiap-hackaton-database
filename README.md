@@ -26,7 +26,6 @@
 
 1. **Certifique-se que a VPC foi criada**:
    ```bash
-   cd ../vpc
    make deploy
    ```
 
@@ -67,17 +66,3 @@ Após o deploy, você terá acesso aos seguintes outputs:
 O banco está configurado para aceitar conexões apenas de:
 - Security Group do cluster EKS
 - Porta 5432 (PostgreSQL)
-
-## Segurança
-
-- **Criptografia**: Storage e tráfego criptografados
-- **Credenciais**: Armazenadas no AWS Secrets Manager
-- **Network**: Isolado em subnets privadas
-- **Access Control**: Apenas via security groups
-
-## Monitoramento
-
-O banco está configurado para:
-- Log de conexões
-- Log de desconexões
-- Log de queries com duração > 1 segundo
